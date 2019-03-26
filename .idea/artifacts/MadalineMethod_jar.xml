@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MadalineMethod:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MadalineMethod_jar</output-path>
+    <root id="archive" name="MadalineMethod.jar">
+      <element id="module-output" name="MadalineMethod" />
+    </root>
+  </artifact>
+</component>

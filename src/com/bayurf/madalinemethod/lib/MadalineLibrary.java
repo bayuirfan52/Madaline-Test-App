@@ -17,8 +17,15 @@ public class MadalineLibrary {
                 iterasi = 0;
                 epoch++;
             }
+
+            System.out.println("input : " + Arrays.toString(input[iterasi]));
+            System.out.println("bobot W1 : " + Arrays.toString(bobotw1));
+            System.out.println("bobot W2 : " + Arrays.toString(bobotw2));
+
             zIn_1 = iterasiCekHitung(input[iterasi], bobotw1, bias);
             zIn_2 = iterasiCekHitung(input[iterasi], bobotw2, bias2);
+
+            System.out.println("zIn_1 : " + zIn_1 + ", zIn_2 : " + zIn_2);
 
             praOutput1 = funActivation(zIn_1);
             praOutput2 = funActivation(zIn_2);
@@ -56,12 +63,12 @@ public class MadalineLibrary {
             System.out.println("iterasi : " + iterasi + ", epoch : " + epoch);
             iterasi++;
 
-            try {
+            /*try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
-        }while (epoch != 1000);
+            }*/
+        }while (epoch != 10000);
         System.out.println("Selesai");
     }
 
@@ -119,6 +126,7 @@ public class MadalineLibrary {
 
     private static double iterasiCekHitung(double[] input, double[] bobot, double bias){
         double hasil, sum = 0;
+        System.out.println("input : "+ Arrays.toString(input));
         for (int i = 0; i < input.length; i++){
             sum = sum + bobot[i] + input[i];
         }
