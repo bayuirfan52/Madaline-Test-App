@@ -6,9 +6,11 @@ public class MadalineLibrary {
     private static double[] bobotw1, bobotw2, bobotz = { 0.5, 0.5 };
     private static double deltaW1 = 0.1, deltaW2 = 0.1;
     private static double bias, bias2, bias3 = 0.5, alpha, toleransi;
-    private static int iterasi = 0, epoch = 1;
+    private static int iterasi = 0, epoch = 0;
 
     public static void learn(double[][] input, double[] target){
+        Boolean[] checkUpdate = new Boolean[input.length];
+        boolean isLoop, isLoopFinal;
         double praOutput1, praOutput2,zIn_1, zIn_2, hasil, output;
 
         do {
@@ -18,9 +20,9 @@ public class MadalineLibrary {
                 epoch++;
             }
 
-            System.out.println("input : " + Arrays.toString(input[iterasi]));
             System.out.println("bobot W1 : " + Arrays.toString(bobotw1));
             System.out.println("bobot W2 : " + Arrays.toString(bobotw2));
+            System.out.println("input : "+ Arrays.toString(input[iterasi]));
 
             zIn_1 = iterasiCekHitung(input[iterasi], bobotw1, bias);
             zIn_2 = iterasiCekHitung(input[iterasi], bobotw2, bias2);
@@ -33,17 +35,18 @@ public class MadalineLibrary {
             output = iterasiCekHitung(new double[]{praOutput1, praOutput2}, bobotz, bias3);
             hasil = funActivation(output);
             System.out.println("Value " + hasil + ", target : "+ target[iterasi]);
-            if (hasil != target[iterasi]) {
-                if (hasil == 1) {
+            isLoop = hasil != target[iterasi];
+            if (isLoop) {
+                if (target[iterasi] == 1) {
                     System.out.println("Value != target.  1");
-                    if (getCloseToZero(zIn_1, zIn_2) == zIn_1) {
+                    if (getCloseToZero(zIn_1, zIn_2) == 1) {
                         System.out.println("Update Z_In 1");
                         updateBobotZinClosetoZero(input[iterasi], zIn_1,1);
                     } else {
                         System.out.println("Update Z_In 2");
                         updateBobotZinClosetoZero(input[iterasi], zIn_2,2);
                     }
-                } else {
+                } else if (target[iterasi] == -1){
                     System.out.println("Value != target. -1");
                     if (zIn_1 > 0){
                         System.out.println("Update Z_In 1");
@@ -56,19 +59,29 @@ public class MadalineLibrary {
                 }
             }
 
+            checkUpdate[iterasi] = isLoop;
+            System.out.println("deltaW1 : " + deltaW1 + ", deltaW2 : " + deltaW2);
             if (deltaW1 < toleransi || deltaW2 < toleransi){
-                System.out.println("Melewati batas toleransi, deltaW1 : " + deltaW1 + ", deltaW2 : " + deltaW2);
                 break;
             }
+
+            System.out.println("check Update : " + Arrays.toString(checkUpdate));
+            isLoopFinal = Arrays.stream(checkUpdate).noneMatch(val -> val);
+            System.out.println("isLoopFinal : " + isLoopFinal);
+            if (isLoopFinal){
+                System.out.println("Semua bobot telah sesuai target");
+                break;
+            }
+
             System.out.println("iterasi : " + iterasi + ", epoch : " + epoch);
             iterasi++;
 
-            /*try {
-                Thread.sleep(200);
+            try {
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
-        }while (epoch != 10000);
+            }
+        }while (epoch != 1000);
         System.out.println("Selesai");
     }
 
@@ -86,49 +99,74 @@ public class MadalineLibrary {
         return hasil;
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private static void updateBobotZinClosetoZero(double[] input, double z_in, int status){
-        double[] deltaW = new double[input.length];
-        for (int i = 0; i < input.length; i++){
-            if (status == 1) {
-                bobotw1[i] = bobotw1[i] + alpha * (1 - z_in);
-                deltaW[i] = bobotw1[i];
-            }
-            else {
-                bobotw2[i] = bobotw2[i] + alpha * (1 - z_in);
-                deltaW[i] = bobotw2[i];
-            }
-            bias2 = bias2 + alpha * (-1 - z_in) * input[i];
-            System.out.println("bobot : "+ bobotw2[i]);
+        double[] deltaW;
+        double biasUpdate;
+        if (status == 1){
+            deltaW = bobotw1;
+            biasUpdate = bias;
         }
-        System.out.println("bias : "+ bias2);
-        if (status == 1) deltaW1 = Math.abs(Arrays.stream(deltaW).max().getAsDouble());
-        else deltaW2 = Math.abs(Arrays.stream(deltaW).max().getAsDouble());
+        else {
+            deltaW = bobotw2;
+            biasUpdate = bias2;
+        }
+
+        for (int i = 0; i < input.length; i++){
+            deltaW[i] = deltaW[i] + (alpha * (1 - z_in) * input[i]);
+            System.out.println("bobot["+i+"] : "+ biasUpdate);
+        }
+        biasUpdate = biasUpdate + alpha * (1 - z_in);
+
+        System.out.println("bias : "+ biasUpdate);
+        if (status == 1) {
+            bobotw1 = deltaW;
+            deltaW1 = Math.abs(Arrays.stream(deltaW).max().getAsDouble());
+            bias = biasUpdate;
+        }
+        else {
+            bobotw2 = deltaW;
+            deltaW2 = Math.abs(Arrays.stream(deltaW).max().getAsDouble());
+            bias2 = biasUpdate;
+        }
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private static void updateBobotZinPositive(double[] input, double z_in, int status){
-        double[] deltaW = new double[input.length];
-        for (int i = 0; i < input.length; i++){
-            if (status == 1) {
-                bobotw1[i] = bobotw1[i] + alpha * (-1 - z_in);
-                deltaW[i] = bobotw1[i];
-            }
-            else {
-                bobotw2[i] = bobotw2[i] + alpha * (-1 - z_in);
-                deltaW[i] = bobotw2[i];
-            }
-            bias2 = bias2 + alpha * (-1 - z_in) * input[i];
-            System.out.println("bobot : "+ bobotw2[i]);
+        double[] deltaW;
+        double biasUpdate;
+        if (status == 1){
+            deltaW = bobotw1;
+            biasUpdate = bias;
         }
-        System.out.println("bias : "+ bias2);
-        if (status == 1) deltaW1 = Math.abs(Arrays.stream(deltaW).max().getAsDouble());
-        else deltaW2 = Math.abs(Arrays.stream(deltaW).max().getAsDouble());
+        else {
+            deltaW = bobotw2;
+            biasUpdate = bias2;
+        }
+
+        for (int i = 0; i < input.length; i++){
+            deltaW[i] = deltaW[i] + (alpha * (-1 - z_in) * input[i]);
+            System.out.println("bobot["+i+"] : "+ biasUpdate);
+        }
+        biasUpdate = biasUpdate + alpha * (-1 - z_in);
+
+        System.out.println("bias : "+ biasUpdate);
+        if (status == 1) {
+            bobotw1 = deltaW;
+            deltaW1 = Math.abs(Arrays.stream(deltaW).max().getAsDouble());
+            bias = biasUpdate;
+        }
+        else {
+            bobotw2 = deltaW;
+            deltaW2 = Math.abs(Arrays.stream(deltaW).max().getAsDouble());
+            bias2 = biasUpdate;
+        }
     }
 
     private static double iterasiCekHitung(double[] input, double[] bobot, double bias){
         double hasil, sum = 0;
-        System.out.println("input : "+ Arrays.toString(input));
         for (int i = 0; i < input.length; i++){
-            sum = sum + bobot[i] + input[i];
+            sum = sum + (bobot[i] * input[i]);
         }
 
         hasil = bias + sum;
@@ -138,6 +176,7 @@ public class MadalineLibrary {
 
     private static int funActivation(double input){
         int output;
+
         if (input >= 0) output = 1;
         else output = -1;
 
@@ -146,9 +185,8 @@ public class MadalineLibrary {
 
     private static double getCloseToZero(double z_in1, double z_in2){
         double output;
-        double[] sort = {z_in1, z_in2};
-        Arrays.sort(sort);
-        output = sort[0];
+        output = Double.compare(z_in1,z_in2);
+        System.out.println("Compare value : " + output);
         return output;
     }
 
