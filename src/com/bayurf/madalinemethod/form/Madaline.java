@@ -27,6 +27,7 @@ public class Madaline {
     private JLabel bias_z2Value;
     private JLabel w12Value;
     private JLabel w22Value;
+    private JLabel statusValue;
 
     private static double[][] input = {
             { 1, 1},
@@ -74,6 +75,7 @@ public class Madaline {
             bias_z1Value.setText(String.valueOf(numberFormat.format(bias1)));
             bias_z2Value.setText(String.valueOf(numberFormat.format(bias2)));
             epochValue.setText(String.valueOf(MadalineLibrary.getIterasi()));
+            statusValue.setText(MadalineLibrary.getStatus());
         });
 
         testButton.addActionListener(v -> {

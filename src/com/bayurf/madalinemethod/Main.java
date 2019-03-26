@@ -11,6 +11,8 @@ public class Main {
         frame.setContentPane(new Madaline().mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
+        frame.setAlwaysOnTop(true);
+        frame.setResizable(true);
         frame.pack();
         frame.setVisible(true);
     }

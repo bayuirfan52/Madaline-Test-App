@@ -7,6 +7,7 @@ public class MadalineLibrary {
     private static double deltaW1 = 0.1, deltaW2 = 0.1;
     private static double bias, bias2, bias3 = 0.5, alpha, toleransi;
     private static int iterasi = 0, epoch = 0;
+    private static String status;
 
     public static void learn(double[][] input, double[] target){
         Boolean[] checkUpdate = new Boolean[input.length];
@@ -62,6 +63,7 @@ public class MadalineLibrary {
             checkUpdate[iterasi] = isLoop;
             System.out.println("deltaW1 : " + deltaW1 + ", deltaW2 : " + deltaW2);
             if (deltaW1 < toleransi || deltaW2 < toleransi){
+                status = "Perubahan bobot melebihi batas toleransi";
                 break;
             }
 
@@ -69,7 +71,7 @@ public class MadalineLibrary {
             isLoopFinal = Arrays.stream(checkUpdate).noneMatch(val -> val);
             System.out.println("isLoopFinal : " + isLoopFinal);
             if (isLoopFinal){
-                System.out.println("Semua bobot telah sesuai target");
+                status = "Semua bobot telah sesuai target";
                 break;
             }
 
@@ -82,7 +84,7 @@ public class MadalineLibrary {
                 e.printStackTrace();
             }
         }while (epoch != 1000);
-        System.out.println("Selesai");
+        if (epoch == 1000) status = "Epoch melebihi batas (Epoch = 1000)";
     }
 
     public static double test(double[] input){
@@ -232,5 +234,9 @@ public class MadalineLibrary {
 
     public static void setBias2(double bias2) {
         MadalineLibrary.bias2 = bias2;
+    }
+
+    public static String getStatus() {
+        return status;
     }
 }
