@@ -9,3 +9,5 @@ Code ini menggunakan konsep OOP (Object Oriented Programming) yang mengedepankan
 
 ### Note
 Program ini tentunya masih banyak kekurangan. Kontribusi anda akan sangat membantu untuk saya maupun orang lain yang sedang mempelajarinya.
+
+Gunakan aplikasi IntelliJ IDEA untuk membuka source code ini. Tidak disarankan untuk membuka dengan NetBeans.
